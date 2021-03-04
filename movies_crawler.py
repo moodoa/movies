@@ -32,7 +32,7 @@ class Movies:
         movie_info["name"] = movie_data.select_one("h1").text
         movie_info["trans_name"] = movie_data.select_one("h3").text
         for tag in soup.select("meta")[3:]:
-            if str(tag["content"])[-3:] in ["jpg", "png", "jpeg"]:
+            if str(tag["content"])[-3:].lower() in ["jpg", "png", "jpeg"]:
                 movie_info["poster"] = str(tag["content"])
                 break
         if movie_data.select_one("span").text.startswith("上映日期"):
@@ -40,3 +40,24 @@ class Movies:
         else:
             movie_info["release_date"] =  " "
         return movie_info
+
+    def template_maker(self):
+        template = "🔥近期最熱門：\n"
+        for url in self._get_most_like_movies_url():
+            movie_info = self._get_movies_info(url)
+            template+=f"\n{movie_info['name']}"
+            template+=f"\n{movie_info['trans_name']}"
+            template+=f"\n{movie_info['poster']}"
+            template+=f"\n{movie_info['release_date']}\n\n"
+        template += "\n\n\n❤️網友最期待：\n"
+        for url in self._get_wanna_see_movies_url():
+            movie_info = self._get_movies_info(url)
+            template+=f"\n{movie_info['name']}"
+            template+=f"\n{movie_info['trans_name']}"
+            template+=f"\n{movie_info['poster']}"
+            template+=f"\n{movie_info['release_date']}\n\n"
+        return template
+
+if __name__ == "__main__":
+    movie = Movies()
+    print(movie.template_maker())
